@@ -1,0 +1,21 @@
+{
+  "name": "devboard-tracker",
+  "version": "1.0.0",
+  "description": "Chrome extension client for DevBoard job application tracker.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "chrome-extension",
+    "job-tracker",
+    "devboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chrome": "^0.1.268",
+    "typescript": "^5.4.5"
+  }
+}

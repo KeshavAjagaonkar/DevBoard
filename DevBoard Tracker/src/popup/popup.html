@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevBoard Tracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">◆</span>
+      <span class="logo-text">DevBoard</span>
+    </div>
+    <button id="logout-btn" class="logout-link" hidden>Logout</button>
+  </header>
+
+  <main>
+    <!-- State: not on a job page -->
+    <section id="view-no-job" class="view" hidden>
+      <div class="empty-state">
+        <span class="empty-icon">🔍</span>
+        <p>Open a job posting to track it</p>
+      </div>
+    </section>
+
+    <!-- State: login required -->
+    <section id="view-login" class="view" hidden>
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="you@email.com" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" id="login-btn" class="btn btn-primary">Log in</button>
+        <button type="button" id="demo-btn" class="btn btn-secondary">Demo Mode (Bypass Auth)</button>
+      </form>
+    </section>
+
+    <!-- State: track application -->
+    <section id="view-track" class="view" hidden>
+      <form id="track-form">
+        <div class="field">
+          <label for="track-company">Company</label>
+          <input type="text" id="track-company" placeholder="Company name" required>
+        </div>
+        <div class="field">
+          <label for="track-role">Role</label>
+          <input type="text" id="track-role" placeholder="e.g. Backend Engineer" required>
+        </div>
+        <div class="field">
+          <label for="track-url">JD URL</label>
+          <input type="url" id="track-url" required>
+        </div>
+        <button type="submit" id="track-btn" class="btn btn-primary">Track this</button>
+      </form>
+    </section>
+
+    <!-- Feedback banner -->
+    <div id="feedback" class="feedback" hidden></div>
+  </main>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
