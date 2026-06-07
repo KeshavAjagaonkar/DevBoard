@@ -5,9 +5,7 @@ import { logger } from "./logger";
 const isTls = env.REDIS_URL.startsWith("rediss://");
 
 const redis = new Redis(env.REDIS_URL, {
-  lazyConnect: true,
   maxRetriesPerRequest: 1,
-  enableOfflineQueue: false,
   retryStrategy(times) {
     if (times > 3) {
       return null;
@@ -15,6 +13,10 @@ const redis = new Redis(env.REDIS_URL, {
     return Math.min(times * 200, 1000);
   },
   ...(isTls ? { tls: { rejectUnauthorized: false } } : {}),
+});
+
+redis.on("connect", () => {
+  logger.info("Redis client connected successfully");
 });
 
 redis.on("error", (err) => {

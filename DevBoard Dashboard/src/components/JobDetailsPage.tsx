@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { Application } from "../services/api";
-import { ArrowLeft, Building, Briefcase, Calendar, Link2, FileText, Trash2, Clock, CheckCircle } from "lucide-react";
+import { ArrowLeft, Building, Briefcase, Calendar, Link2, FileText, Trash2, Clock, CheckCircle, Mail } from "lucide-react";
 
 interface JobDetailsPageProps {
   job: Application;
@@ -31,10 +31,18 @@ export const JobDetailsPage: React.FC<JobDetailsPageProps> = ({
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [expandedEmailLogs, setExpandedEmailLogs] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setNotes(job.notes || "");
   }, [job]);
+
+  const toggleEmailPreview = (logId: string) => {
+    setExpandedEmailLogs((prev) => ({
+      ...prev,
+      [logId]: !prev[logId],
+    }));
+  };
 
   const handleStatusChange = async (value: string) => {
     try {
@@ -184,15 +192,79 @@ export const JobDetailsPage: React.FC<JobDetailsPageProps> = ({
                 {job.statusLogs.map((log) => (
                   <li key={log.id} className="timeline-item">
                     <span className="timeline-bullet" />
-                    <span>
-                      {log.fromStatus === log.toStatus ? (
-                        <>Created in stage <strong>{formatStatus(log.toStatus)}</strong></>
-                      ) : (
-                        <>
-                          Moved to <strong>{formatStatus(log.toStatus)}</strong>
-                        </>
+                    <span style={{ width: "100%" }}>
+                      <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
+                        {log.fromStatus === log.toStatus ? (
+                          <>Created in stage <strong>{formatStatus(log.toStatus)}</strong></>
+                        ) : (
+                          <>
+                            Moved to <strong>{formatStatus(log.toStatus)}</strong>
+                          </>
+                        )}
+                        {log.source === "EMAIL_SCAN" && (
+                          <span style={{ 
+                            display: "inline-flex", 
+                            alignItems: "center", 
+                            gap: "3px", 
+                            fontSize: "10px", 
+                            color: "#0b6fa2", 
+                            backgroundColor: "#e2f2ff", 
+                            padding: "1px 5px", 
+                            borderRadius: "4px", 
+                            fontWeight: 500 
+                          }}>
+                            <Mail size={10} />
+                            Email Sync
+                          </span>
+                        )}
+                      </div>
+
+                      {log.emailSubject && (
+                        <div style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "4px", fontWeight: 500 }}>
+                          Subject: {log.emailSubject}
+                        </div>
                       )}
-                      <div className="timeline-time">
+
+                      {log.emailContent && (
+                        <div style={{ marginTop: "4px" }}>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => toggleEmailPreview(log.id)}
+                            style={{ 
+                              fontSize: "10px", 
+                              padding: "2px 6px", 
+                              height: "auto",
+                              lineHeight: "1",
+                              display: "inline-flex", 
+                              alignItems: "center" 
+                            }}
+                          >
+                            {expandedEmailLogs[log.id] ? "Hide Email Content" : "View Email Content"}
+                          </button>
+                          {expandedEmailLogs[log.id] && (
+                            <pre style={{
+                              marginTop: "6px",
+                              padding: "8px",
+                              backgroundColor: "rgba(55, 53, 47, 0.04)",
+                              border: "1px solid var(--border-color)",
+                              borderRadius: "var(--radius-md)",
+                              fontSize: "11px",
+                              whiteSpace: "pre-wrap",
+                              fontFamily: "monospace",
+                              color: "var(--text-primary)",
+                              maxHeight: "120px",
+                              overflowY: "auto",
+                              textAlign: "left",
+                              lineHeight: "1.3"
+                            }}>
+                              {log.emailContent}
+                            </pre>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="timeline-time" style={{ marginTop: "4px" }}>
                         {new Date(log.changedAt).toLocaleDateString(undefined, {
                           month: "short",
                           day: "numeric",

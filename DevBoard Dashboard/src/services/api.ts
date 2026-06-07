@@ -7,6 +7,8 @@ export interface StatusLog {
   toStatus: string;
   changedAt: string;
   source: string;
+  emailSubject?: string | null;
+  emailContent?: string | null;
 }
 
 export interface Application {
@@ -76,6 +78,17 @@ async function request<T>(
   return response.json() as Promise<T>;
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  imapEnabled: boolean;
+  imapHost: string | null;
+  imapPort: number | null;
+  imapUser: string | null;
+  hasImapPassword: boolean;
+  lastSyncedAt: string | null;
+}
+
 export const api = {
   async login(email: string, password: string): Promise<{ token: string }> {
     const res = await request<{ token: string }>("/auth/login", {
@@ -127,5 +140,48 @@ export const api = {
 
   async getAnalytics(): Promise<AnalyticsData> {
     return request<AnalyticsData>("/analytics");
+  },
+
+  async getProfile(): Promise<UserProfile> {
+    return request<UserProfile>("/profile");
+  },
+
+  async updateProfile(payload: {
+    imapEnabled?: boolean;
+    imapHost?: string | null;
+    imapPort?: number | null;
+    imapUser?: string | null;
+    imapPassword?: string | null;
+  }): Promise<UserProfile> {
+    return request<UserProfile>("/profile", {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async testImap(payload?: {
+    imapHost?: string;
+    imapPort?: number;
+    imapUser?: string;
+    imapPassword?: string;
+  }): Promise<{ ok: boolean; message: string }> {
+    return request<{ ok: boolean; message: string }>("/profile/test-imap", {
+      method: "POST",
+      body: JSON.stringify(payload || {}),
+    });
+  },
+
+  async syncEmails(): Promise<{
+    ok: boolean;
+    message: string;
+    stats: { syncedCount: number; updatedCount: number };
+  }> {
+    return request<{
+      ok: boolean;
+      message: string;
+      stats: { syncedCount: number; updatedCount: number };
+    }>("/profile/sync", {
+      method: "POST",
+    });
   },
 };

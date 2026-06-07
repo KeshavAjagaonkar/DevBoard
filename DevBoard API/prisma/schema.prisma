@@ -13,6 +13,14 @@ model User {
   passwordHash String
   createdAt    DateTime      @default(now())
   applications Application[]
+
+  // IMAP configuration for automated tracking
+  imapEnabled  Boolean       @default(false)
+  imapHost     String?
+  imapPort     Int?
+  imapUser     String?
+  imapPassword String?       // App Password (encrypted)
+  lastSyncedAt DateTime?
 }
 
 model Application {
@@ -39,6 +47,8 @@ model StatusLog {
   toStatus      Status
   changedAt     DateTime    @default(now())
   source        LogSource   @default(MANUAL)
+  emailSubject  String?
+  emailContent  String?     // Snippet of email content
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 

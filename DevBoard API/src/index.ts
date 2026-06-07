@@ -8,6 +8,8 @@ import { errorHandler } from "./middleware/errorHandler";
 import authRouter from "./routes/auth";
 import applicationsRouter from "./routes/applications";
 import analyticsRouter from "./routes/analytics";
+import profileRouter from "./routes/profile";
+import { initCronJobs } from "./services/cron";
 
 const app = express();
 
@@ -18,8 +20,12 @@ app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/applications", auth, applicationsRouter);
 app.use("/analytics", auth, analyticsRouter);
+app.use("/profile", profileRouter);
 
 app.use(errorHandler);
+
+// Start background schedulers
+initCronJobs();
 
 app.listen(env.PORT, () => {
   logger.info(`Server is running on port ${env.PORT} in ${env.NODE_ENV} mode`);

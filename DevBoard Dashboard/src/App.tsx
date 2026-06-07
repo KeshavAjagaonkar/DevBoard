@@ -6,7 +6,8 @@ import { AnalyticsPanel } from "./components/AnalyticsPanel";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { JobModal } from "./components/JobModal";
 import { JobDetailsPage } from "./components/JobDetailsPage";
-import { Compass, Plus, LogOut } from "lucide-react";
+import { IMAPSettings } from "./components/IMAPSettings";
+import { Compass, Plus, LogOut, Settings, RefreshCw } from "lucide-react";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,6 +21,13 @@ function App() {
   const [activeView, setActiveView] = useState<"board" | "details">("board");
   const [selectedJob, setSelectedJob] = useState<Application | null>(null);
 
+  // Email sync and profile state
+  const [userEmail, setUserEmail] = useState("test@example.com");
+  const [imapEnabled, setImapEnabled] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
+
   // Check login state on startup
   useEffect(() => {
     const token = getToken();
@@ -32,12 +40,15 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const [appsData, statsData] = await Promise.all([
+      const [appsData, statsData, profileData] = await Promise.all([
         api.getApplications(),
         api.getAnalytics(),
+        api.getProfile(),
       ]);
       setApplications(appsData);
       setAnalytics(statsData);
+      setUserEmail(profileData.email);
+      setImapEnabled(profileData.imapEnabled);
       
       // Update selectedJob state if we are currently viewing the details page
       if (selectedJob) {
@@ -68,6 +79,25 @@ function App() {
     setAnalytics(null);
     setSelectedJob(null);
     setActiveView("board");
+    setUserEmail("test@example.com");
+    setImapEnabled(false);
+  };
+
+  const handleSyncEmails = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    setSyncStatusMsg("Scanning inbox...");
+    try {
+      const res = await api.syncEmails();
+      setSyncStatusMsg(`Sync complete! Found ${res.stats.syncedCount} emails, updated ${res.stats.updatedCount} jobs.`);
+      await fetchData();
+      setTimeout(() => setSyncStatusMsg(null), 5000);
+    } catch (err: any) {
+      setSyncStatusMsg(`Sync failed: ${err.message || "Connection error"}`);
+      setTimeout(() => setSyncStatusMsg(null), 5000);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleSaveJob = async (payload: {
@@ -121,7 +151,7 @@ function App() {
           <span className="logo-text">DevBoard</span>
         </div>
         <div className="user-nav">
-          <span className="user-email">test@example.com</span>
+          <span className="user-email">{userEmail}</span>
           <button className="btn btn-secondary" onClick={handleLogout} style={{ padding: "4px 8px", fontSize: "12px" }}>
             <LogOut size={12} />
             Logout
@@ -148,11 +178,34 @@ function App() {
                 <h2>Your Tracking Pipeline</h2>
                 <p>Monitor your stages and conversion rates</p>
               </div>
-              <button className="btn btn-primary" onClick={() => { setEditingJob(null); setIsModalOpen(true); }}>
-                <Plus size={14} />
-                Add Application
-              </button>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                {imapEnabled && (
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={handleSyncEmails} 
+                    disabled={isSyncing}
+                    style={{ fontSize: "12px", padding: "6px 12px" }}
+                  >
+                    <RefreshCw size={12} className={isSyncing ? "animate-spin" : ""} />
+                    {isSyncing ? "Syncing..." : "Sync Emails"}
+                  </button>
+                )}
+                <button className="btn btn-secondary" onClick={() => setIsSettingsOpen(true)}>
+                  <Settings size={14} />
+                  Email Settings
+                </button>
+                <button className="btn btn-primary" onClick={() => { setEditingJob(null); setIsModalOpen(true); }}>
+                  <Plus size={14} />
+                  Add Application
+                </button>
+              </div>
             </div>
+
+            {syncStatusMsg && (
+              <div className={`feedback-msg ${syncStatusMsg.includes("failed") ? "error" : "success"}`} style={{ margin: "0", fontSize: "12px", width: "fit-content" }}>
+                {syncStatusMsg}
+              </div>
+            )}
 
             {/* Analytics panels */}
             {analytics && <AnalyticsPanel data={analytics} />}
@@ -183,6 +236,13 @@ function App() {
             setEditingJob(null);
           }}
           onSave={handleSaveJob}
+        />
+      )}
+
+      {isSettingsOpen && (
+        <IMAPSettings
+          onClose={() => setIsSettingsOpen(false)}
+          onSave={fetchData}
         />
       )}
     </div>
