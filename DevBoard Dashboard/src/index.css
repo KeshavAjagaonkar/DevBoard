@@ -715,28 +715,69 @@ header {
   gap: 30px;
 }
 
-.details-header {
+.details-header-banner {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(35, 131, 226, 0.05) 0%, rgba(35, 131, 226, 0.01) 100%);
+  border: 1px solid rgba(35, 131, 226, 0.1);
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.details-header-banner::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--primary) 0%, #60a5fa 100%);
+}
+
+.details-header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.company-logo-placeholder {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 .details-company {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 10px;
   color: var(--text-primary);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
 }
 
 .details-role {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--text-secondary);
+}
+
+.details-status-badge .badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .details-notes-section {
