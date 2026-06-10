@@ -16,7 +16,7 @@ const JOB_BOARD_HOSTS = [
   "cutshort.io",
 ];
 
-const JOB_PATH_SEGMENTS = ["job", "career", "opening", "role"];
+const JOB_PATH_SEGMENTS = ["job", "jobs", "career", "careers", "opening", "role", "vacancy", "vacancies", "opportunity", "opportunities", "req", "posting"];
 
 const JOB_TITLE_KEYWORDS = [
   "engineer",
@@ -140,7 +140,7 @@ function detectJobPage(url: string, title: string): JobDetectionResult {
   const lowerTitle = title.toLowerCase();
 
   const isJobBoard = JOB_BOARD_HOSTS.some((d) => hostMatches(hostname, d));
-  const hasJobPath = JOB_PATH_SEGMENTS.some((seg) => pathname.includes(seg));
+  const hasJobPath = JOB_PATH_SEGMENTS.some((seg) => pathname.includes(seg) || hostname.includes(seg));
   const isSearchEngine = SEARCH_ENGINE_HOSTS.some((d) => hostMatches(hostname, d));
   const hasJobTitle =
     !isSearchEngine && JOB_TITLE_KEYWORDS.some((kw) => lowerTitle.includes(kw));
@@ -152,7 +152,20 @@ function detectJobPage(url: string, title: string): JobDetectionResult {
 
   const parsedData = parseTitle(title);
   const company = parsedData.company ?? extractCompanyFromHostname(hostname);
-  const role = parsedData.role;
+  let role = parsedData.role;
+  
+  // If role is still null but we know it's a job page, use the clean title as fallback
+  if (!role && isJobPage && title) {
+    let fallbackRole = title.replace(TITLE_STRIP_PATTERN, "").trim();
+    // remove company name from fallback role if it exists
+    if (company && fallbackRole.toLowerCase().includes(company.toLowerCase())) {
+        fallbackRole = fallbackRole.replace(new RegExp(company, 'ig'), '').trim();
+        fallbackRole = fallbackRole.replace(/^[\s|\-\u2013\u2014:]+|[\s|\-\u2013\u2014:]+$/g, '').trim();
+    }
+    if (fallbackRole.length > 2) {
+        role = fallbackRole;
+    }
+  }
 
   return { isJobPage: true, inferredCompany: company, inferredRole: role };
 }

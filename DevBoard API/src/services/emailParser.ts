@@ -106,7 +106,21 @@ export function parseEmail(
     "privacy policy",
     "terms of service",
     "terms of use",
-    "read in the app"
+    "read in the app",
+    "unstop",
+    "naukri",
+    "job alert",
+    "job listing",
+    "jobs listing",
+    "job roundup",
+    "weekly jobs",
+    "new jobs",
+    "career alert",
+    "top jobs",
+    "recommended jobs",
+    "jobs for you",
+    "ai newsletter",
+    "tech newsletter"
   ];
 
   if (negativeKeywords.some(kw => combinedText.includes(kw))) {
@@ -331,8 +345,9 @@ export function parseEmail(
   } else if (appliedKeywords.some(kw => combinedText.includes(kw))) {
     status = Status.APPLIED;
   } else {
-    // Default fallback to APPLIED for general job-related emails
-    status = Status.APPLIED;
+    // If no explicit lifecycle status is found, it's likely a generic newsletter/job posting.
+    // We only want to track explicit applications, rejections, interviews, etc.
+    return null;
   }
 
   // 6. Try to extract the role
