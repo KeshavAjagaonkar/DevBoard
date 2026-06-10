@@ -16,7 +16,7 @@ const JOB_BOARD_HOSTS = [
   "cutshort.io",
 ];
 
-const JOB_PATH_SEGMENTS = ["/jobs/", "/careers/", "/job/", "/opening/", "/role/"];
+const JOB_PATH_SEGMENTS = ["job", "career", "opening", "role"];
 
 const JOB_TITLE_KEYWORDS = [
   "engineer",

@@ -11,6 +11,7 @@ const views = {
 const feedback = document.getElementById("feedback") as HTMLDivElement;
 const logoutBtn = document.getElementById("logout-btn") as HTMLButtonElement;
 const settingsBtn = document.getElementById("settings-btn") as HTMLButtonElement;
+const trackManualBtn = document.getElementById("track-manual-btn") as HTMLButtonElement;
 
 const loginForm = document.getElementById("login-form") as HTMLFormElement;
 const loginEmail = document.getElementById("login-email") as HTMLInputElement;
@@ -176,6 +177,40 @@ settingsForm.addEventListener("submit", async (e) => {
 settingsBackBtn.addEventListener("click", () => {
   clearFeedback();
   showView(previousView);
+});
+
+trackManualBtn.addEventListener("click", async () => {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  const activeTab = tabs[0];
+  if (activeTab && activeTab.url) {
+    trackUrl.value = activeTab.url;
+    
+    // Guess company from domain name
+    try {
+      const parsed = new URL(activeTab.url);
+      const host = parsed.hostname.replace(/^www\./, "");
+      const domainParts = host.split(".");
+      if (domainParts.length >= 2) {
+        const rawName = domainParts[domainParts.length - 2];
+        trackComp.value = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+      }
+    } catch {}
+    
+    // Guess role from title
+    if (activeTab.title) {
+      const cleanTitle = activeTab.title
+        .replace(/\s*[|\u2013\-\u2014]\s*(?:Jobs|Careers|LinkedIn|Indeed|Home|Hiring).*$/i, "")
+        .trim();
+      trackRole.value = cleanTitle;
+    }
+  }
+  
+  const token = await getToken();
+  if (!token) {
+    showView("login");
+  } else {
+    showView("track");
+  }
 });
 
 init();
