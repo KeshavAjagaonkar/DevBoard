@@ -95,15 +95,22 @@ export const JobDetailsPage: React.FC<JobDetailsPageProps> = ({
       <div className="details-layout">
         {/* Main Details Panel */}
         <div className="details-main">
-          <div className="details-header">
-            <h1 className="details-company">
-              <Building size={24} style={{ color: "var(--text-secondary)" }} />
-              {job.company}
-            </h1>
-            <h2 className="details-role">
-              <Briefcase size={18} style={{ color: "var(--text-secondary)" }} />
-              {job.role}
-            </h2>
+          <div className="details-header-banner">
+            <div className="details-header-content">
+              <div className="company-logo-placeholder">
+                {job.company.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h1 className="details-company">{job.company}</h1>
+                <h2 className="details-role">
+                  <Briefcase size={16} />
+                  {job.role}
+                </h2>
+              </div>
+            </div>
+            <div className="details-status-badge">
+              <span className={`badge badge-${job.status.toLowerCase()}`}>{formatStatus(job.status)}</span>
+            </div>
           </div>
 
           <div className="details-notes-section">
