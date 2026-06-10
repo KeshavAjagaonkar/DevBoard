@@ -5,10 +5,12 @@ const views = {
   noJob: document.getElementById("view-no-job") as HTMLElement,
   login: document.getElementById("view-login") as HTMLElement,
   track: document.getElementById("view-track") as HTMLElement,
+  settings: document.getElementById("view-settings") as HTMLElement,
 };
 
 const feedback = document.getElementById("feedback") as HTMLDivElement;
 const logoutBtn = document.getElementById("logout-btn") as HTMLButtonElement;
+const settingsBtn = document.getElementById("settings-btn") as HTMLButtonElement;
 
 const loginForm = document.getElementById("login-form") as HTMLFormElement;
 const loginEmail = document.getElementById("login-email") as HTMLInputElement;
@@ -22,13 +24,19 @@ const trackRole = document.getElementById("track-role") as HTMLInputElement;
 const trackUrl = document.getElementById("track-url") as HTMLInputElement;
 const trackBtn = document.getElementById("track-btn") as HTMLButtonElement;
 
+const settingsForm = document.getElementById("settings-form") as HTMLFormElement;
+const settingsApiUrl = document.getElementById("settings-api-url") as HTMLInputElement;
+const settingsBackBtn = document.getElementById("settings-back-btn") as HTMLButtonElement;
+
 let currentTabId: number | undefined;
+let previousView: keyof typeof views = "noJob";
 
 function showView(viewName: keyof typeof views): void {
   Object.keys(views).forEach((key) => {
     views[key as keyof typeof views].hidden = key !== viewName;
   });
   logoutBtn.hidden = viewName !== "track";
+  settingsBtn.hidden = viewName === "settings";
 }
 
 function showFeedback(message: string, isError = true): void {
@@ -139,6 +147,35 @@ logoutBtn.addEventListener("click", async () => {
   clearFeedback();
   await clearToken();
   showView("login");
+});
+
+settingsBtn.addEventListener("click", async () => {
+  const currentActive = Object.keys(views).find(
+    (key) => !views[key as keyof typeof views].hidden
+  ) as keyof typeof views;
+  if (currentActive && currentActive !== "settings") {
+    previousView = currentActive;
+  }
+  const stored = (await chrome.storage.local.get("devboard_api_url")) as { devboard_api_url?: string };
+  settingsApiUrl.value = stored.devboard_api_url || "http://localhost:3001";
+  showView("settings");
+});
+
+settingsForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearFeedback();
+  const url = settingsApiUrl.value.trim().replace(/\/$/, "");
+  await chrome.storage.local.set({ devboard_api_url: url });
+  showFeedback("API URL saved!", false);
+  setTimeout(() => {
+    clearFeedback();
+    showView(previousView);
+  }, 1000);
+});
+
+settingsBackBtn.addEventListener("click", () => {
+  clearFeedback();
+  showView(previousView);
 });
 
 init();

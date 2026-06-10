@@ -12,7 +12,10 @@
       <span class="logo-icon">◆</span>
       <span class="logo-text">DevBoard</span>
     </div>
-    <button id="logout-btn" class="logout-link" hidden>Logout</button>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button id="settings-btn" class="settings-link" title="API URL Settings">⚙️</button>
+      <button id="logout-btn" class="logout-link" hidden>Logout</button>
+    </div>
   </header>
 
   <main>
@@ -56,6 +59,20 @@
           <input type="url" id="track-url" required>
         </div>
         <button type="submit" id="track-btn" class="btn btn-primary">Track this</button>
+      </form>
+    </section>
+
+    <!-- State: settings (API URL configuration) -->
+    <section id="view-settings" class="view" hidden>
+      <form id="settings-form">
+        <div class="field">
+          <label for="settings-api-url">API Base URL</label>
+          <input type="url" id="settings-api-url" placeholder="http://localhost:3001" required>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button type="submit" id="settings-save-btn" class="btn btn-primary" style="flex: 1;">Save</button>
+          <button type="button" id="settings-back-btn" class="btn btn-secondary" style="flex: 1;">Back</button>
+        </div>
       </form>
     </section>
 

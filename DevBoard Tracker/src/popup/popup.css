@@ -65,6 +65,23 @@ header {
   color: var(--error);
 }
 
+.settings-link {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.settings-link:hover {
+  color: var(--text-primary);
+  transform: rotate(45deg);
+}
+
 .logo {
   display: flex;
   align-items: center;

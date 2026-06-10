@@ -1,9 +1,9 @@
 import crypto from "crypto";
+import { env } from "../config/env";
 
 const ALGORITHM = "aes-256-cbc";
-// We require a 32-byte key. We take ENCRYPTION_KEY from environment, or use a secure fallback for dev.
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "devboard_default_encryption_key_32bytes_long!";
-const key = Buffer.from(ENCRYPTION_KEY.substring(0, 32));
+// We require a 32-byte key. We take ENCRYPTION_KEY from environment.
+const key = Buffer.from(env.ENCRYPTION_KEY.substring(0, 32));
 const IV_LENGTH = 16;
 
 export function encrypt(text: string): string {
