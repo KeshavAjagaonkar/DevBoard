@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { Application } from "../services/api";
-import { ArrowLeft, Building, Briefcase, Calendar, Link2, FileText, Trash2, Clock, CheckCircle, Mail } from "lucide-react";
+import { ArrowLeft, Briefcase, Calendar, Link2, FileText, Trash2, Clock, CheckCircle, Mail } from "lucide-react";
 
 interface JobDetailsPageProps {
   job: Application;
