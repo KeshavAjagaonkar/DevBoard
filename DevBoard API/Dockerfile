@@ -1,6 +1,9 @@
 # Stage 1: Build the TypeScript application
 FROM node:20-alpine AS builder
 
+# Install openssl needed for Prisma engine
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy package files
@@ -22,6 +25,9 @@ RUN npm prune --production
 
 # Stage 2: Production runner
 FROM node:20-alpine AS runner
+
+# Install openssl in production runtime for Prisma query engine
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
